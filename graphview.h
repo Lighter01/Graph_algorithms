@@ -8,10 +8,13 @@
 #include <QGraphicsItemGroup>
 #include <QTimer>
 #include <QMouseEvent>
+#include <QItemSelection>
+
 
 #include <vector>
 
 #include "node.h"
+#include "graph.h"
 
 
 class graphView : public QGraphicsView
@@ -31,12 +34,19 @@ private slots:
 private:
     void mousePressEvent(QMouseEvent* event);
 
+
 private:
-    std::vector<Node*> my_graph;
-    void addNode();
+    std::pair<int, QPointF> selected_node_0, selected_node_1;
+    std::vector<Node*> form_graph;
+    graph origin_graph;
 
 private:
     QPen line_pen;
+    int gen_flag;
+
+public:
+    std::pair<int, QPointF> findNode(const QPointF& pos);
+    double countDistance(const QPointF& p1, const QPointF& p2);
 };
 
 #endif // GRAPHVIEW_H

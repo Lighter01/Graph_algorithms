@@ -69,10 +69,10 @@ std::vector<std::vector<int>> graph::get_matrix() const
     return this->matrix;
 }
 
-//std::vector<std::vector<int>>& graph::change_matrix()
-//{
-//    return this->matrix;
-//}
+std::vector<std::vector<int>>& graph::change_matrix()
+{
+    return this->matrix;
+}
 
 long long graph::get_full_sum()
 {

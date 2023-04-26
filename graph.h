@@ -18,7 +18,7 @@ public:
     void complete_graph(); // Max length of edge is full_sum of matrix
 
     std::vector<std::vector<int>> get_matrix() const;
-//    std::vector<std::vector<int>>& change_matrix();
+    std::vector<std::vector<int>>& change_matrix();
     long long get_full_sum();
 
     ~graph();
