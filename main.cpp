@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-#include "graphview.h"
+//#include "graphview.h"
+#include <QFontDatabase>
 
 
 int main(int argc, char *argv[])

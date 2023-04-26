@@ -1,8 +1,9 @@
 #include "node.h"
 
 
-Node::Node (const QRectF& rectangle, const int& idx) :
-    QGraphicsEllipseItem(rectangle),
+Node::Node (const QRectF& rectangle, const int& idx, QGraphicsItem *parent) :
+    QGraphicsItemGroup(parent),
+    node(new QGraphicsEllipseItem(rectangle)),
     node_pen(QColor(19, 136, 67)),
     node_brush(QColor(38, 189, 146)),
     node_id(new QGraphicsTextItem(QString::number(idx)))
@@ -10,12 +11,18 @@ Node::Node (const QRectF& rectangle, const int& idx) :
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemSendsScenePositionChanges);
 
+    node->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsScenePositionChanges);
+    node_id->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsScenePositionChanges);
+
     node_pen.setWidth(2);
-    this->setPen(node_pen);
-    this->setBrush(node_brush);
+    node->setPen(node_pen);
+    node->setBrush(node_brush);
     node_id->setDefaultTextColor(QColor(255, 198, 42));
-    node_id->setFont(QFont("Arial", 16));
+    node_id->setFont(QFont("Franklin Gothic Medium", 12));
     node_id->setZValue(2);
+
+    addToGroup(node);
+    addToGroup(node_id);
 }
 
 void Node::addLine(QGraphicsLineItem *line, bool isPoint1) {
@@ -37,8 +44,8 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
 void Node::moveLinesToCenter(QPointF newPos) {
     // Converts the elipse position (top-left)
     // to its center position
-    int xOffset = rect().x() + rect().width()/2;
-    int yOffset = rect().y() + rect().height()/2;
+    int xOffset = boundingRect().x() + boundingRect().width()/2;
+    int yOffset = boundingRect().y() + boundingRect().height()/2;
 
     QPointF newCenterPos = QPointF(newPos.x() + xOffset, newPos.y() + yOffset);
 

@@ -13,11 +13,11 @@
 #include <vector>
 
 
-class Node : public QGraphicsEllipseItem
+class Node : public QGraphicsItemGroup
 {
 public:
     Node();
-    Node(const QRectF& rectangle, const int& idx);
+    Node(const QRectF& rectangle, const int& idx, QGraphicsItem *parent = 0);
 
     void addLine(QGraphicsLineItem *line, bool isPoint1);
 
@@ -28,6 +28,7 @@ public:
     QGraphicsTextItem* getNodeId();
 
 private:
+    QGraphicsEllipseItem* node;
     std::vector<std::pair<QGraphicsLineItem*, bool>> lines;
 
 private:

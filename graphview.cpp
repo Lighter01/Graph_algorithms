@@ -43,11 +43,9 @@ void graphView::mousePressEvent(QMouseEvent *event)
         pos.rx() -= 30/2; pos.ry() -= 30/2;
         Node* newNode = new Node(QRectF(0, 0, 30, 30), my_graph.size() + 1);
         newNode->setPos(pos);
-        newNode->getNodeId()->setPos(pos);
         //adding new node
         my_graph.push_back(newNode);
         my_scene->addItem(newNode);
-        my_scene->addItem(newNode->getNodeId());
 
         QGraphicsLineItem *line;
         for (int i = 0; i < this->my_graph.size() - 1; ++i) {
