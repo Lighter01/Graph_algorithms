@@ -51,7 +51,8 @@ std::pair<int, QPointF> graphView::findNode(const QPointF& pos)
     for (int i = 0; i < form_graph.size(); ++i) {
         x = form_graph.at(i)->pos().rx();
         y = form_graph.at(i)->pos().ry();
-        if (x + 30 > pos.x() && y + 30 > pos.y()) {
+        qDebug() << x << x + 30 << y << y + 30;
+        if (pos.x() >= x && pos.x() <= x+30 && pos.y() >= y && pos.y() <= y + 30) {
             return std::make_pair(i, form_graph.at(i)->pos());
         }
     }
@@ -81,9 +82,8 @@ void graphView::mousePressEvent(QMouseEvent *event)
                 //adding new node
                 form_graph.push_back(newNode);
                 my_scene->addItem(newNode);
-//                QGraphicsLineItem *line;
-                LineWrapper *line = new LineWrapper();
                 for (int i = 0; i < this->form_graph.size() - 1; ++i) {
+                    LineWrapper *line = new LineWrapper();
                     line->getLine() = my_scene->addLine(QLineF(0, 0, 1, 1));
                     line->getLine()->setZValue(-1);
                     line->getLine()->setPen(line_pen);
@@ -94,11 +94,12 @@ void graphView::mousePressEvent(QMouseEvent *event)
                     line->setNode2() = form_graph.at(i);
                     form_graph.at(i)->addLine(line, false);
                     form_graph.back()->addLine(line, true);
-                    for (auto it : form_graph) {
-                        for (auto jt : it->getLines()) {
-                            qDebug() << jt.first;
-                        }
-                    }
+                    // Debug zone
+//                    for (int j = 0; j < form_graph.size(); ++j) {
+//                        for (int k = 0; k < form_graph.at(j)->getLines().size(); ++k) {
+//                            qDebug() << j << k << form_graph.at(j)->getLines().at(k).first << form_graph.at(j)->getLines().at(k).first->setNode1() << form_graph.at(j)->getLines().at(k).first->setNode2();
+//                        }
+//                    }
                     if (this->form_graph.size() > origin_graph.get_matrix().size()) {
                         origin_graph.change_matrix().resize(this->form_graph.size());
                         for (auto& it :  origin_graph.change_matrix()) {
@@ -109,9 +110,9 @@ void graphView::mousePressEvent(QMouseEvent *event)
                     origin_graph.change_matrix().at(i).at(this->form_graph.size() - 1) = countDistance(form_graph.back()->pos(), form_graph.at(i)->pos());
 
                     for (int i = 0; i < origin_graph.get_matrix().size(); ++i) {
-                        QDebug deb = qDebug();
+                        QDebug debug = qDebug();
                         for (int j = 0; j < origin_graph.change_matrix().at(i).size(); ++j) {
-                            deb << origin_graph.change_matrix().at(i).at(j);
+                            debug << origin_graph.change_matrix().at(i).at(j);
                         }
                     }
                     qDebug();
@@ -132,12 +133,12 @@ void graphView::mousePressEvent(QMouseEvent *event)
         } else if (event->button() == Qt::RightButton) {
             qDebug("right button pressed");
             QGraphicsItem* item = my_scene->itemAt(mapToScene(event->pos()), QTransform());
+            qDebug() << mapToScene(event->pos());
             if (item != NULL) {
                 std::pair<int, QPointF> cur_selected_node = findNode(mapToScene(event->pos()));
                 qDebug() << cur_selected_node.first;
                 delete form_graph.at(cur_selected_node.first);
-                std::vector<Node*>::iterator it = std::find(form_graph.begin(), form_graph.end(), form_graph.at(cur_selected_node.first));
-                form_graph.erase(it);
+                form_graph.erase(form_graph.begin() + cur_selected_node.first);
             }
         }
     } else if (gen_flag == 1) {

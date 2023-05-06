@@ -11,6 +11,7 @@ public:
     LineWrapper();
     LineWrapper(QGraphicsLineItem* _line, Node* _node1, Node* _node2);
     ~LineWrapper();
+    void deleteLine(Node* cur_node);
     QGraphicsLineItem*& getLine();
     Node*& setNode1();
     Node*& setNode2();
