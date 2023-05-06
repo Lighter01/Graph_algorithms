@@ -25,6 +25,8 @@ set(PROJECT_SOURCES
         graphview.cpp
         node.h
         node.cpp
+        linewrapper.h
+        linewrapper.cpp
 
         popup.h
 )

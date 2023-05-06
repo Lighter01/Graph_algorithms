@@ -2,6 +2,8 @@
 #include "popup.h"
 
 #include <cmath>
+#include <iterator>
+#include <algorithm>
 
 graphView::graphView(QWidget *parent) :
     QGraphicsView(parent),
@@ -10,7 +12,7 @@ graphView::graphView(QWidget *parent) :
     line_pen(QColor(98, 57, 72)),
     selected_node_0(std::make_pair(-1, QPointF(-1, -1))),
     selected_node_1(std::make_pair(-1, QPointF(-1, -1))),
-    gen_flag(0)
+    gen_flag(0) // choose entering edge weight mode
 
 {
     /* Немного поднастроим отображение виджета и его содержимого */
@@ -64,56 +66,79 @@ double graphView::countDistance(const QPointF& p1, const QPointF& p2)
 void graphView::mousePressEvent(QMouseEvent *event)
 {
     if (gen_flag == 0) {
-        QGraphicsItem* item = my_scene->itemAt(mapToScene(event->pos()), QTransform());
-        if (item == NULL) {
-            QPointF pos = mapToScene(event->pos());
-            pos.rx() -= 30/2; pos.ry() -= 30/2;
-            Node* newNode = new Node(QRectF(0, 0, 30, 30), form_graph.size() + 1);
-            newNode->setPos(pos);
-            if (form_graph.size() + 1 <= 9) {
-                newNode->getNodeId()->setPos(5,1);
-            } else {
-                newNode->getNodeId()->setPos(1,1);
-            }
-            //adding new node
-            form_graph.push_back(newNode);
-            my_scene->addItem(newNode);
-            QGraphicsLineItem *line;
-            for (int i = 0; i < this->form_graph.size() - 1; ++i) {
-                line = my_scene->addLine(QLineF(0, 0, 1, 1));
-                line->setZValue(-1);
-                line->setPen(line_pen);
-                form_graph.at(i)->addLine(line, false);
-                form_graph.back()->addLine(line, true);
-                if (this->form_graph.size() > origin_graph.get_matrix().size()) {
-                    origin_graph.change_matrix().resize(this->form_graph.size());
-                    for (auto& it :  origin_graph.change_matrix()) {
-                        it.resize(this->form_graph.size());
-                    }
+        if (event->button() == Qt::LeftButton) {
+            QGraphicsItem* item = my_scene->itemAt(mapToScene(event->pos()), QTransform());
+            if (item == NULL) {
+                QPointF pos = mapToScene(event->pos());
+                pos.rx() -= 30/2; pos.ry() -= 30/2;
+                Node* newNode = new Node(QRectF(0, 0, 30, 30), form_graph.size() + 1);
+                newNode->setPos(pos);
+                if (form_graph.size() + 1 <= 9) {
+                    newNode->getNodeId()->setPos(5,1);
+                } else {
+                    newNode->getNodeId()->setPos(1,1);
                 }
-                origin_graph.change_matrix().at(this->form_graph.size() - 1).at(i) = countDistance(form_graph.back()->pos(), form_graph.at(i)->pos());
-                origin_graph.change_matrix().at(i).at(this->form_graph.size() - 1) = countDistance(form_graph.back()->pos(), form_graph.at(i)->pos());
+                //adding new node
+                form_graph.push_back(newNode);
+                my_scene->addItem(newNode);
+//                QGraphicsLineItem *line;
+                LineWrapper *line = new LineWrapper();
+                for (int i = 0; i < this->form_graph.size() - 1; ++i) {
+                    line->getLine() = my_scene->addLine(QLineF(0, 0, 1, 1));
+                    line->getLine()->setZValue(-1);
+                    line->getLine()->setPen(line_pen);
+                    line->getLine() = my_scene->addLine(QLineF(0, 0, 1, 1));
+                    line->getLine()->setZValue(-1);
+                    line->getLine()->setPen(line_pen);
+                    line->setNode1() = form_graph.back();
+                    line->setNode2() = form_graph.at(i);
+                    form_graph.at(i)->addLine(line, false);
+                    form_graph.back()->addLine(line, true);
+                    for (auto it : form_graph) {
+                        for (auto jt : it->getLines()) {
+                            qDebug() << jt.first;
+                        }
+                    }
+                    if (this->form_graph.size() > origin_graph.get_matrix().size()) {
+                        origin_graph.change_matrix().resize(this->form_graph.size());
+                        for (auto& it :  origin_graph.change_matrix()) {
+                            it.resize(this->form_graph.size());
+                        }
+                    }
+                    origin_graph.change_matrix().at(this->form_graph.size() - 1).at(i) = countDistance(form_graph.back()->pos(), form_graph.at(i)->pos());
+                    origin_graph.change_matrix().at(i).at(this->form_graph.size() - 1) = countDistance(form_graph.back()->pos(), form_graph.at(i)->pos());
 
-                for (int i = 0; i < origin_graph.get_matrix().size(); ++i) {
-                    QDebug deb = qDebug();
-                    for (int j = 0; j < origin_graph.change_matrix().at(i).size(); ++j) {
-                        deb << origin_graph.change_matrix().at(i).at(j);
+                    for (int i = 0; i < origin_graph.get_matrix().size(); ++i) {
+                        QDebug deb = qDebug();
+                        for (int j = 0; j < origin_graph.change_matrix().at(i).size(); ++j) {
+                            deb << origin_graph.change_matrix().at(i).at(j);
+                        }
                     }
+                    qDebug();
+                    //                curve
+                    //                endPoint = form_graph.at(i)->pos() + QPointF(0, form_graph.at(i)->boundingRect().height()/2);
+                    //                QPointF controlPoint = (pos + endPoint) / 2 + QPointF(50, 0);
+                    //                QPainterPath path(pos);
+                    //                path.cubicTo(controlPoint, controlPoint, endPoint);
+                    //                QGraphicsPathItem *pathItem = new QGraphicsPathItem(path);
+                    //                pathItem->setPen(QPen(Qt::black));
+                    //                form_graph.at(i)->addCurve(pathItem, false, pos, endPoint);
+                    //                form_graph.back()->addCurve(pathItem, true, pos, endPoint);
+                    //                my_scene->addItem(pathItem);
                 }
-                qDebug();
-                //                curve
-                //                endPoint = form_graph.at(i)->pos() + QPointF(0, form_graph.at(i)->boundingRect().height()/2);
-                //                QPointF controlPoint = (pos + endPoint) / 2 + QPointF(50, 0);
-                //                QPainterPath path(pos);
-                //                path.cubicTo(controlPoint, controlPoint, endPoint);
-                //                QGraphicsPathItem *pathItem = new QGraphicsPathItem(path);
-                //                pathItem->setPen(QPen(Qt::black));
-                //                form_graph.at(i)->addCurve(pathItem, false, pos, endPoint);
-                //                form_graph.back()->addCurve(pathItem, true, pos, endPoint);
-                //                my_scene->addItem(pathItem);
+            } else if (item->flags() & QGraphicsItem::ItemIsMovable) {
+                QGraphicsView::mousePressEvent(event);
             }
-        } else if (item->flags() & QGraphicsItem::ItemIsMovable) {
-            QGraphicsView::mousePressEvent(event);
+        } else if (event->button() == Qt::RightButton) {
+            qDebug("right button pressed");
+            QGraphicsItem* item = my_scene->itemAt(mapToScene(event->pos()), QTransform());
+            if (item != NULL) {
+                std::pair<int, QPointF> cur_selected_node = findNode(mapToScene(event->pos()));
+                qDebug() << cur_selected_node.first;
+                delete form_graph.at(cur_selected_node.first);
+                std::vector<Node*>::iterator it = std::find(form_graph.begin(), form_graph.end(), form_graph.at(cur_selected_node.first));
+                form_graph.erase(it);
+            }
         }
     } else if (gen_flag == 1) {
         if (event->modifiers() == Qt::ControlModifier) {
@@ -141,9 +166,12 @@ void graphView::mousePressEvent(QMouseEvent *event)
                         int result = dialog.exec();
                         if (result == QDialog::Accepted) {
                             QString value = dialog.getValue();
-                            QGraphicsLineItem *line = my_scene->addLine(start.rx(), start.ry(), end.rx(), end.ry());
-                            line->setZValue(-1);
-                            line->setPen(line_pen);
+                            LineWrapper *line = new LineWrapper();
+                            line->getLine() = my_scene->addLine(start.rx(), start.ry(), end.rx(), end.ry());
+                            line->getLine()->setZValue(-1);
+                            line->getLine()->setPen(line_pen);
+                            line->setNode1() = form_graph.at(selected_node_0.first);
+                            line->setNode2() = form_graph.at(selected_node_1.first);
                             form_graph.at(selected_node_0.first)->addLine(line, true);
                             form_graph.at(selected_node_1.first)->addLine(line, false);
                             qDebug("Вес рабра был введен");

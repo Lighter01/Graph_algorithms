@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QStandardItemModel>
+
 
 #include "graph.h"
 #include "graphview.h"
@@ -23,6 +25,10 @@ private:
     Ui::MainWindow *ui;
     graph g;
     graphView *MyGraphView;
+    QStandardItemModel* graph_matrix;
+
+signals:
+    void graphChanged();
 };
 
 #endif // MAINWINDOW_H

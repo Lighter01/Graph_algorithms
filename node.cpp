@@ -1,4 +1,11 @@
-#include "node.h"
+#include "linewrapper.h"
+
+Node::Node() : node(new QGraphicsEllipseItem())
+{
+    for (auto& it : lines) {
+        it.first = new LineWrapper();
+    }
+}
 
 
 Node::Node (const QRectF& rectangle, const int& idx, QGraphicsItem *parent) :
@@ -32,6 +39,16 @@ Node::Node (const QRectF& rectangle, const int& idx, QGraphicsItem *parent) :
 
 }
 
+Node::~Node()
+{
+    qDebug("starting to delete nodes");
+    delete node;
+    for (auto& it : lines) {
+        delete it.first;
+    }
+    delete node_id;
+}
+
 //void Node::addCurve(QGraphicsPathItem *curve, bool isPoint1, const QPointF& start, const QPointF& end)
 //{
 //    this->curves.emplace_back(curve, isPoint1);
@@ -39,7 +56,7 @@ Node::Node (const QRectF& rectangle, const int& idx, QGraphicsItem *parent) :
 //}
 
 
-void Node::addLine(QGraphicsLineItem *line, bool isPoint1) {
+void Node::addLine(LineWrapper *line, bool isPoint1) {
     this->lines.emplace_back(line, isPoint1);
     moveLinesToCenter(QPointF(this->pos().x(), this->pos().y()));
 }
@@ -83,10 +100,10 @@ void Node::moveLinesToCenter(QPointF newPos) {
 
     for (auto& it : this->lines) {
         // Move the required point of the line to the center of the elipse
-        QPointF p1 = it.second ? newCenterPos : it.first->line().p1();
-        QPointF p2 = it.second ? it.first->line().p2() : newCenterPos;
+        QPointF p1 = it.second ? newCenterPos : it.first->getLine()->line().p1();
+        QPointF p2 = it.second ? it.first->getLine()->line().p2() : newCenterPos;
 
-        it.first->setLine(QLineF(p1, p2));
+        it.first->getLine()->setLine(QLineF(p1, p2));
     }
 }
 
@@ -98,6 +115,11 @@ QGraphicsTextItem *Node::getNodeId()
 QGraphicsEllipseItem* Node::getNode()
 {
     return this->node;
+}
+
+std::vector<std::pair<LineWrapper *, bool> > Node::getLines()
+{
+    return this->lines;
 }
 
 

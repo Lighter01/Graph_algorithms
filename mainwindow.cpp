@@ -10,8 +10,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow),
-    MyGraphView(new graphView())
-
+    MyGraphView(new graphView()),
+    graph_matrix(new QStandardItemModel)
 {
     ui->setupUi(this);
     ui->graphLayout->addWidget(MyGraphView);

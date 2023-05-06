@@ -13,8 +13,9 @@
 
 #include <vector>
 
-#include "node.h"
+//#include "node.h"
 #include "graph.h"
+#include "linewrapper.h"
 
 
 class graphView : public QGraphicsView

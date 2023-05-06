@@ -20,11 +20,31 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_4">
-    <item row="0" column="0">
-     <layout class="QGridLayout" name="graphLayout"/>
-    </item>
-   </layout>
+   <widget class="QWidget" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>11</x>
+      <y>11</y>
+      <width>841</width>
+      <height>641</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <layout class="QGridLayout" name="graphLayout"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QTableView" name="graphMatrixVIew">
+    <property name="geometry">
+     <rect>
+      <x>880</x>
+      <y>11</y>
+      <width>256</width>
+      <height>441</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
