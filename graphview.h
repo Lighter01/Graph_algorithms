@@ -10,8 +10,7 @@
 #include <QMouseEvent>
 #include <QItemSelection>
 
-#include <QStandardItemModel>
-//#include <QTableWidgetItem>
+#include <QTableWidgetItem>
 
 
 #include <vector>
@@ -51,7 +50,6 @@ private:
     graph origin_graph;
 
 private:
-    QStandardItemModel* matrix_view;
     QPen line_pen;
     int gen_flag;
 

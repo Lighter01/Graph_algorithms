@@ -12,7 +12,6 @@ graphView::graphView(Ui::MainWindow *_ui, QWidget *parent) :
     ui(_ui),
     form_graph(),
     my_scene(new QGraphicsScene),
-    matrix_view(new QStandardItemModel),
     line_pen(QColor(98, 57, 72)),
     selected_node_0(std::make_pair(-1, QPointF(-1, -1))),
     selected_node_1(std::make_pair(-1, QPointF(-1, -1))),
@@ -72,32 +71,31 @@ double graphView::countDistance(const QPointF& p1, const QPointF& p2)
 void graphView::updateTableView()
 {
     /// Add data into tableview
-    matrix_view->clear();
+    int matrix_size = this->form_graph.size();
+    ui->matrixWidget->insertRow(ui->matrixWidget->rowCount());
+    ui->matrixWidget->insertColumn(ui->matrixWidget->columnCount());
 
-    QStringList tmp_columns;
-    for (int i = 0; i < origin_graph.get_matrix().size(); ++i) {
-        tmp_columns.push_back(QString::number(i + 1));
-    }
-    matrix_view->setHorizontalHeaderLabels(tmp_columns);
+    QTableWidgetItem* item = new QTableWidgetItem(tr("%1").arg(6));
+    ui->matrixWidget->setItem(0,0, item);
 
-    int row = 0, col = 0;
-    for (int i = 0; i < origin_graph.get_matrix().size(); ++i) {
-        for (int j = 0; j < origin_graph.change_matrix().at(i).size(); ++j) {
-            QStandardItem *tmp_item = new QStandardItem(QString::number(origin_graph.change_matrix().at(i).at(j)));
-            //строка, столбец, объект
-            matrix_view->setItem(row, col++, tmp_item);
-        }
-        ++row;
-        col = 0;
-    }
+    // Set the initial header names
+//    for (int i = 0; i < matrix_size; i++) {
+//        QTableWidgetItem* rowHeader = new QTableWidgetItem(QString("Row %1").arg(i+1));
+//        ui->matrixWidget->setVerticalHeaderItem(i, rowHeader);
+//    }
+//    for (int i = 0; i < matrix_size; i++) {
+//        QTableWidgetItem* columnHeader = new QTableWidgetItem(QString("Column %1").arg(i+1));
+//        ui->matrixWidget->setHorizontalHeaderItem(i, columnHeader);
+//    }
 
-    QFont headerFont("Arial", 10, QFont::Bold);
-    ui->graphMatrixView->horizontalHeader()->setFont(headerFont);
-    ui->graphMatrixView->verticalHeader()->setFont(headerFont);
-    ui->graphMatrixView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->graphMatrixView->resizeColumnsToContents();
-
-    ui->graphMatrixView->setModel(matrix_view);
+//    ui->matrixWidget->setRowCount(matrix_size);
+//    ui->matrixWidget->setColumnCount(matrix_size);
+//    for (int row = 0; row < matrix_size; ++row) {
+//        for (int column = 0; column < matrix_size; ++column) {
+//            QTableWidgetItem *item = new QTableWidgetItem("weight");
+//            tableWidget->setItem(row, column, item);
+//        }
+//    }
 }
 
 void graphView::mousePressEvent(QMouseEvent *event)
@@ -152,8 +150,6 @@ void graphView::mousePressEvent(QMouseEvent *event)
                         }
                     }
 
-                    this->updateTableView();
-
                     //                curve
                     //                endPoint = form_graph.at(i)->pos() + QPointF(0, form_graph.at(i)->boundingRect().height()/2);
                     //                QPointF controlPoint = (pos + endPoint) / 2 + QPointF(50, 0);
@@ -165,6 +161,10 @@ void graphView::mousePressEvent(QMouseEvent *event)
                     //                form_graph.back()->addCurve(pathItem, true, pos, endPoint);
                     //                my_scene->addItem(pathItem);
                 }
+                this->updateTableView();
+
+                qDebug();
+
             } else if (item->flags() & QGraphicsItem::ItemIsMovable) {
                 QGraphicsView::mousePressEvent(event);
             }
