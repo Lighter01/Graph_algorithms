@@ -10,7 +10,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow),
-    MyGraphView(new graphView()),
+    MyGraphView(new graphView(ui)),
     graph_matrix(new QStandardItemModel)
 {
     ui->setupUi(this);

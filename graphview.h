@@ -10,6 +10,9 @@
 #include <QMouseEvent>
 #include <QItemSelection>
 
+#include <QStandardItemModel>
+//#include <QTableWidgetItem>
+
 
 #include <vector>
 
@@ -18,12 +21,17 @@
 #include "linewrapper.h"
 
 
+QT_BEGIN_NAMESPACE
+namespace Ui { class MainWindow; }
+QT_END_NAMESPACE
+
+
 class graphView : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    explicit graphView(QWidget *parent = 0);
+    explicit graphView(Ui::MainWindow *_ui, QWidget *parent = 0);
     ~graphView();
 
 public:
@@ -33,6 +41,7 @@ private slots:
 //    void slotAlarmTimer();
 
 private:
+    Ui::MainWindow *ui;
     void mousePressEvent(QMouseEvent* event);
 
 
@@ -42,12 +51,14 @@ private:
     graph origin_graph;
 
 private:
+    QStandardItemModel* matrix_view;
     QPen line_pen;
     int gen_flag;
 
 public:
     std::pair<int, QPointF> findNode(const QPointF& pos);
     double countDistance(const QPointF& p1, const QPointF& p2);
+    void updateTableView();
 };
 
 #endif // GRAPHVIEW_H

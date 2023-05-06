@@ -1,14 +1,18 @@
 #include "graphview.h"
 #include "popup.h"
 
+#include "./ui_mainwindow.h"
+
 #include <cmath>
 #include <iterator>
 #include <algorithm>
 
-graphView::graphView(QWidget *parent) :
+graphView::graphView(Ui::MainWindow *_ui, QWidget *parent) :
     QGraphicsView(parent),
+    ui(_ui),
     form_graph(),
     my_scene(new QGraphicsScene),
+    matrix_view(new QStandardItemModel),
     line_pen(QColor(98, 57, 72)),
     selected_node_0(std::make_pair(-1, QPointF(-1, -1))),
     selected_node_1(std::make_pair(-1, QPointF(-1, -1))),
@@ -34,6 +38,7 @@ graphView::graphView(QWidget *parent) :
     this->setRenderHint(QPainter::Antialiasing);
 
     line_pen.setWidth(2);
+
 
 }
 
@@ -62,6 +67,37 @@ std::pair<int, QPointF> graphView::findNode(const QPointF& pos)
 double graphView::countDistance(const QPointF& p1, const QPointF& p2)
 {
     return std::sqrt(std::pow(p1.x() - p2.x(), 2) + qPow(p1.y() - p2.y(), 2));
+}
+
+void graphView::updateTableView()
+{
+    /// Add data into tableview
+    matrix_view->clear();
+
+    QStringList tmp_columns;
+    for (int i = 0; i < origin_graph.get_matrix().size(); ++i) {
+        tmp_columns.push_back(QString::number(i + 1));
+    }
+    matrix_view->setHorizontalHeaderLabels(tmp_columns);
+
+    int row = 0, col = 0;
+    for (int i = 0; i < origin_graph.get_matrix().size(); ++i) {
+        for (int j = 0; j < origin_graph.change_matrix().at(i).size(); ++j) {
+            QStandardItem *tmp_item = new QStandardItem(QString::number(origin_graph.change_matrix().at(i).at(j)));
+            //строка, столбец, объект
+            matrix_view->setItem(row, col++, tmp_item);
+        }
+        ++row;
+        col = 0;
+    }
+
+    QFont headerFont("Arial", 10, QFont::Bold);
+    ui->graphMatrixView->horizontalHeader()->setFont(headerFont);
+    ui->graphMatrixView->verticalHeader()->setFont(headerFont);
+    ui->graphMatrixView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->graphMatrixView->resizeColumnsToContents();
+
+    ui->graphMatrixView->setModel(matrix_view);
 }
 
 void graphView::mousePressEvent(QMouseEvent *event)
@@ -115,7 +151,9 @@ void graphView::mousePressEvent(QMouseEvent *event)
                             debug << origin_graph.change_matrix().at(i).at(j);
                         }
                     }
-                    qDebug();
+
+                    this->updateTableView();
+
                     //                curve
                     //                endPoint = form_graph.at(i)->pos() + QPointF(0, form_graph.at(i)->boundingRect().height()/2);
                     //                QPointF controlPoint = (pos + endPoint) / 2 + QPointF(50, 0);
