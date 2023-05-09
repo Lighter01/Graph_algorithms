@@ -41,7 +41,7 @@ Node::Node (const QRectF& rectangle, const int& idx, QGraphicsItem *parent) :
 
 Node::~Node()
 {
-    qDebug("starting to delete nodes");
+//    qDebug("starting to delete nodes");
     for (auto& it : lines) {
         it.first->deleteLine(this);
     }

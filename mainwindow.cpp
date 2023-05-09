@@ -16,11 +16,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui->graphLayout->addWidget(MyGraphView);
     ui->matrixWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->matrixWidget->setItemDelegate(new ReadOnlyDelegate());
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 

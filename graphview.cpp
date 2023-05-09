@@ -9,6 +9,7 @@
 #include <iterator>
 #include <algorithm>
 
+
 graphView::graphView(Ui::MainWindow *_ui, QWidget *parent) :
     QGraphicsView(parent),
     ui(_ui),
@@ -17,7 +18,8 @@ graphView::graphView(Ui::MainWindow *_ui, QWidget *parent) :
     line_pen(QColor(98, 57, 72)),
     selected_node_0(std::make_pair(-1, QPointF(-1, -1))),
     selected_node_1(std::make_pair(-1, QPointF(-1, -1))),
-    gen_flag(0) // choose entering edge weight mode
+    gen_flag(0), // choose entering edge weight mode
+    cellChanged_connected(false)
 
 {
     /* Немного поднастроим отображение виджета и его содержимого */
@@ -47,7 +49,12 @@ graphView::~graphView()
     for (auto& it : form_graph) {
         delete it;
     }
-//    for (auto& it : )
+    //    for (auto& it : )
+}
+
+void graphView::on_matrixWidget_cellChanged(int row, int column)
+{
+    origin_graph.change_matrix().at(row).at(column) = ui->matrixWidget->item(row, column)->text().toInt();
 }
 
 std::pair<int, QPointF> graphView::findNode(const QPointF& pos)
@@ -87,6 +94,9 @@ void graphView::updateTableView()
 
 void graphView::mousePressEvent(QMouseEvent *event)
 {
+    if (!cellChanged_connected) {
+        connect(ui->matrixWidget, &QTableWidget::cellChanged, this, &graphView::on_matrixWidget_cellChanged);
+    }
     if (gen_flag == 0) {
         if (event->button() == Qt::LeftButton) {
             QGraphicsItem* item = my_scene->itemAt(mapToScene(event->pos()), QTransform());
@@ -138,7 +148,7 @@ void graphView::mousePressEvent(QMouseEvent *event)
                             debug << origin_graph.change_matrix().at(i).at(j);
                         }
                     }
-
+                    qDebug();
                     //                curve
                     //                endPoint = form_graph.at(i)->pos() + QPointF(0, form_graph.at(i)->boundingRect().height()/2);
                     //                QPointF controlPoint = (pos + endPoint) / 2 + QPointF(50, 0);
@@ -150,9 +160,9 @@ void graphView::mousePressEvent(QMouseEvent *event)
                     //                form_graph.back()->addCurve(pathItem, true, pos, endPoint);
                     //                my_scene->addItem(pathItem);
                 }
+                ui->matrixWidget->blockSignals(true);
                 this->updateTableView();
-
-                qDebug();
+                ui->matrixWidget->blockSignals(false);
 
             } else if (item->flags() & QGraphicsItem::ItemIsMovable) {
                 QGraphicsView::mousePressEvent(event);
@@ -180,7 +190,10 @@ void graphView::mousePressEvent(QMouseEvent *event)
                     form_graph.at(i)->setNodeId(i+1);
                 }
                 qDebug() << origin_graph.get_matrix().size();
+
+                ui->matrixWidget->blockSignals(true);
                 this->updateTableView();
+                ui->matrixWidget->blockSignals(false);
             }
         }
     } else if (gen_flag == 1) {
@@ -250,5 +263,3 @@ void graphView::mousePressEvent(QMouseEvent *event)
         }
     }
 }
-
-

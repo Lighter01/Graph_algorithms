@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QStandardItemModel>
+#include <QItemDelegate>
 
 
 #include "graph.h"
@@ -25,6 +26,24 @@ private:
 
 signals:
     void graphChanged();
+};
+
+
+
+// Help class for disabling cells with (n, n) indices
+// Help class for disabling cells with (n, n) indices
+class ReadOnlyDelegate : public QItemDelegate
+{
+public:
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const override
+    {
+        if (index.column() == index.row()) {
+            return nullptr;
+        } else {
+            return QItemDelegate::createEditor(parent, option, index);
+        }
+    }
 };
 
 #endif // MAINWINDOW_H

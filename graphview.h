@@ -37,6 +37,7 @@ public:
     QGraphicsScene *my_scene;
 
 private slots:
+    void on_matrixWidget_cellChanged(int row, int column);
 //    void slotAlarmTimer();
 
 private:
@@ -52,7 +53,7 @@ private:
 private:
     QPen line_pen;
     int gen_flag;
-
+    bool cellChanged_connected;
 public:
     std::pair<int, QPointF> findNode(const QPointF& pos);
     double countDistance(const QPointF& p1, const QPointF& p2);
