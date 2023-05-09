@@ -3,6 +3,8 @@
 
 #include "./ui_mainwindow.h"
 
+#include <QHeaderView>
+
 #include <cmath>
 #include <iterator>
 #include <algorithm>
@@ -38,7 +40,6 @@ graphView::graphView(Ui::MainWindow *_ui, QWidget *parent) :
 
     line_pen.setWidth(2);
 
-
 }
 
 graphView::~graphView()
@@ -72,30 +73,16 @@ void graphView::updateTableView()
 {
     /// Add data into tableview
     int matrix_size = this->form_graph.size();
-    ui->matrixWidget->insertRow(ui->matrixWidget->rowCount());
-    ui->matrixWidget->insertColumn(ui->matrixWidget->columnCount());
-
-    QTableWidgetItem* item = new QTableWidgetItem(tr("%1").arg(6));
-    ui->matrixWidget->setItem(0,0, item);
-
-    // Set the initial header names
-//    for (int i = 0; i < matrix_size; i++) {
-//        QTableWidgetItem* rowHeader = new QTableWidgetItem(QString("Row %1").arg(i+1));
-//        ui->matrixWidget->setVerticalHeaderItem(i, rowHeader);
-//    }
-//    for (int i = 0; i < matrix_size; i++) {
-//        QTableWidgetItem* columnHeader = new QTableWidgetItem(QString("Column %1").arg(i+1));
-//        ui->matrixWidget->setHorizontalHeaderItem(i, columnHeader);
-//    }
-
-//    ui->matrixWidget->setRowCount(matrix_size);
-//    ui->matrixWidget->setColumnCount(matrix_size);
-//    for (int row = 0; row < matrix_size; ++row) {
-//        for (int column = 0; column < matrix_size; ++column) {
-//            QTableWidgetItem *item = new QTableWidgetItem("weight");
-//            tableWidget->setItem(row, column, item);
-//        }
-//    }
+    ui->matrixWidget->setColumnCount(matrix_size);
+    ui->matrixWidget->setRowCount(matrix_size);
+    if (matrix_size > 1) {
+        for (int row = 0; row < matrix_size; ++row) {
+            for (int column = 0; column < matrix_size; ++column) {
+                QTableWidgetItem* item = new QTableWidgetItem(tr("%1").arg(origin_graph.change_matrix().at(row).at(column)));
+                ui->matrixWidget->setItem(row, column, item);
+            }
+        }
+    }
 }
 
 void graphView::mousePressEvent(QMouseEvent *event)
@@ -134,6 +121,8 @@ void graphView::mousePressEvent(QMouseEvent *event)
 //                            qDebug() << j << k << form_graph.at(j)->getLines().at(k).first << form_graph.at(j)->getLines().at(k).first->setNode1() << form_graph.at(j)->getLines().at(k).first->setNode2();
 //                        }
 //                    }
+
+                    /// Assign initial values for matrix of edges weights
                     if (this->form_graph.size() > origin_graph.get_matrix().size()) {
                         origin_graph.change_matrix().resize(this->form_graph.size());
                         for (auto& it :  origin_graph.change_matrix()) {
@@ -176,7 +165,22 @@ void graphView::mousePressEvent(QMouseEvent *event)
                 std::pair<int, QPointF> cur_selected_node = findNode(mapToScene(event->pos()));
                 qDebug() << cur_selected_node.first;
                 delete form_graph.at(cur_selected_node.first);
+
+                // Shrink ui form graph's matrix
                 form_graph.erase(form_graph.begin() + cur_selected_node.first);
+
+                // Shrink original graph's matrix
+                for (int i = 0; i < origin_graph.get_matrix().size(); ++i) {
+                    origin_graph.change_matrix().at(i).erase(origin_graph.change_matrix().at(i).begin() + cur_selected_node.first);
+                }
+                origin_graph.change_matrix().erase(origin_graph.change_matrix().begin() + cur_selected_node.first);
+
+                // Redraw indexes on nodes
+                for (int i = cur_selected_node.first; i < form_graph.size(); ++i) {
+                    form_graph.at(i)->setNodeId(i+1);
+                }
+                qDebug() << origin_graph.get_matrix().size();
+                this->updateTableView();
             }
         }
     } else if (gen_flag == 1) {

@@ -37,6 +37,8 @@ public:
     QGraphicsEllipseItem* getNode();
     std::vector<std::pair<LineWrapper*, bool>> getLines();
 
+    void setNodeId(const int& id);
+
 private:
     QGraphicsEllipseItem* node;
 //    std::vector<std::pair<QGraphicsPathItem*, bool>> curves;

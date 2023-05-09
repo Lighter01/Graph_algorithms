@@ -122,4 +122,10 @@ std::vector<std::pair<LineWrapper *, bool> > Node::getLines()
     return this->lines;
 }
 
+void Node::setNodeId(const int& id)
+{
+//    this->node_id = new QGraphicsTextItem(QString::number(id)); // why when changing this object, the scene object doesn't update?
+    this->node_id->setPlainText(QString::number(id));
+}
+
 
