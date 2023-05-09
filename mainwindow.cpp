@@ -10,13 +10,14 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
     ui(new Ui::MainWindow),
-    MyGraphView(new graphView(ui)),
     graph_matrix(new QStandardItemModel)
 {
     ui->setupUi(this);
-    ui->graphLayout->addWidget(MyGraphView);
     ui->matrixWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->matrixWidget->setItemDelegate(new ReadOnlyDelegate());
+
+    MyGraphView = new graphView(ui);
+    ui->graphLayout->addWidget(MyGraphView);
 }
 
 MainWindow::~MainWindow()

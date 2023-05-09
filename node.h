@@ -45,9 +45,6 @@ private:
     std::vector<std::pair<LineWrapper*, bool>> lines;
 
 private:
-    QPen rect_pen;
-    QBrush rect_brush;
-
     QPen node_pen;
     QBrush node_brush;
     QGraphicsTextItem* node_id;

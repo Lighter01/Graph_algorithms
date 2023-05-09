@@ -29,15 +29,35 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QPushButton" name="algPushButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Рассчитать</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <layout class="QGridLayout" name="graphLayout"/>
        </item>
       </layout>
      </widget>
     </item>
     <item row="0" column="1">
-     <widget class="QTableWidget" name="matrixWidget"/>
+     <widget class="QTableWidget" name="matrixWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

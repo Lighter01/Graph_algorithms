@@ -17,8 +17,8 @@ public:
     Node*& setNode2();
 private:
     QGraphicsLineItem* line;
-    Node* node1; // origin node
-    Node* node2; // connected node
+    Node* node1; // origin node (from)
+    Node* node2; // connected node (to)
 };
 
 #endif // LINEWRAPPER_H

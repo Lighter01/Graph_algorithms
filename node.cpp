@@ -11,8 +11,6 @@ Node::Node() : node(new QGraphicsEllipseItem())
 Node::Node (const QRectF& rectangle, const int& idx, QGraphicsItem *parent) :
     QGraphicsItemGroup(parent),
     node(new QGraphicsEllipseItem(rectangle)),
-    rect_pen(QColor(98, 57, 72)),
-    rect_brush(QColor(55, 216, 153)),
     node_pen(QColor(19, 136, 67)),
     node_brush(QColor(38, 189, 146)),
     node_id(new QGraphicsTextItem(QString::number(idx)))

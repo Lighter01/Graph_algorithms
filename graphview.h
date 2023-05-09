@@ -38,6 +38,7 @@ public:
 
 private slots:
     void on_matrixWidget_cellChanged(int row, int column);
+    void on_algPushButton_clicked();
 //    void slotAlarmTimer();
 
 private:
@@ -51,13 +52,20 @@ private:
     graph origin_graph;
 
 private:
-    QPen line_pen;
+    QPen line_pen; // Need this three variables to return Node pens to start state
+    QPen node_pen;
+    QBrush node_brush;
+
     int gen_flag;
     bool cellChanged_connected;
+    bool graph_highlighted;
+
 public:
     std::pair<int, QPointF> findNode(const QPointF& pos);
     double countDistance(const QPointF& p1, const QPointF& p2);
     void updateTableView();
+    void highlightPath(const std::vector<int>& path); // path is a vector of indices of nodes in a specific order
+    void reverseHighliting(const bool& is_highlighted = false);
 };
 
 #endif // GRAPHVIEW_H

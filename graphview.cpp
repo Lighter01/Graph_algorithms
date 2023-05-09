@@ -8,6 +8,7 @@
 #include <cmath>
 #include <iterator>
 #include <algorithm>
+#include <random>
 
 
 graphView::graphView(Ui::MainWindow *_ui, QWidget *parent) :
@@ -15,11 +16,14 @@ graphView::graphView(Ui::MainWindow *_ui, QWidget *parent) :
     ui(_ui),
     form_graph(),
     my_scene(new QGraphicsScene),
-    line_pen(QColor(98, 57, 72)),
+    line_pen(QColor(98, 57, 72), 2),
+    node_pen(QColor(19, 136, 67), 2),
+    node_brush(QColor(38, 189, 146)),
     selected_node_0(std::make_pair(-1, QPointF(-1, -1))),
     selected_node_1(std::make_pair(-1, QPointF(-1, -1))),
     gen_flag(0), // choose entering edge weight mode
-    cellChanged_connected(false)
+    cellChanged_connected(false),
+    graph_highlighted(false)
 
 {
     /* Немного поднастроим отображение виджета и его содержимого */
@@ -42,6 +46,8 @@ graphView::graphView(Ui::MainWindow *_ui, QWidget *parent) :
 
     line_pen.setWidth(2);
 
+    connect(ui->matrixWidget, &QTableWidget::cellChanged, this, &graphView::on_matrixWidget_cellChanged);
+    connect(ui->algPushButton, &QPushButton::clicked, this, &graphView::on_algPushButton_clicked);
 }
 
 graphView::~graphView()
@@ -49,12 +55,24 @@ graphView::~graphView()
     for (auto& it : form_graph) {
         delete it;
     }
-    //    for (auto& it : )
 }
 
 void graphView::on_matrixWidget_cellChanged(int row, int column)
 {
     origin_graph.change_matrix().at(row).at(column) = ui->matrixWidget->item(row, column)->text().toInt();
+}
+
+void graphView::on_algPushButton_clicked()
+{
+    std::vector<int> tmp;
+    for (int i = 0; i < form_graph.size(); ++i) {
+        tmp.push_back(i);
+    }
+    std::random_device rng;
+    std::mt19937 rg(rng());
+    std::shuffle(tmp.begin(), tmp.end(), rg);
+    tmp.push_back(tmp.at(0));
+    this->highlightPath(tmp);
 }
 
 std::pair<int, QPointF> graphView::findNode(const QPointF& pos)
@@ -92,15 +110,58 @@ void graphView::updateTableView()
     }
 }
 
+///TODO: change node finding: not by index but by any Node object characteristics
+/// Remove one for-loop, cause it's too expensive to traverse two times through the graph, changing opacity for each line
+void graphView::highlightPath(const std::vector<int> &path)
+{
+    graph_highlighted = true;
+    QPen tmp_node_pen(QColor(149,31,58), 2);
+    QBrush tmp_node_brush(QColor(199,98,122));
+    for (int i = 0; i < path.size() - 1; ++i) {
+        for (auto& it : form_graph.at(path.at(i))->getLines()) {
+            it.first->getLine()->setOpacity(0.1);
+        }
+        form_graph.at(path.at(i))->getNode()->setPen(tmp_node_pen);
+        form_graph.at(path.at(i))->getNode()->setBrush(tmp_node_brush);
+    }
+    form_graph.at(path.at(path.size() - 1))->getNode()->setPen(tmp_node_pen);
+    form_graph.at(path.at(path.size() - 1))->getNode()->setBrush(tmp_node_brush);
+
+    QPen tmp_line_pen(Qt::red, 3);
+    for (int i = 0; i < path.size() - 1; ++i) {
+        for (auto& it : form_graph.at(path.at(i))->getLines()) {
+            if (it.first->setNode1()->getNodeId()->toPlainText().toInt() - 1 == path.at(i+1)) {
+                it.first->getLine()->setOpacity(1);
+                it.first->getLine()->setPen(tmp_line_pen);
+            } else if (it.first->setNode2()->getNodeId()->toPlainText().toInt() - 1 == path.at(i+1)) {
+                it.first->getLine()->setOpacity(1);
+                it.first->getLine()->setPen(tmp_line_pen);
+            }
+        }
+    }
+}
+
+void graphView::reverseHighliting(const bool& is_highlighted)
+{
+    if (is_highlighted) {
+        for (auto& it : form_graph) {
+            it->getNode()->setPen(node_pen);
+            it->getNode()->setBrush(node_brush);
+            for (auto& jt : it->getLines()) {
+                jt.first->getLine()->setPen(line_pen);
+                jt.first->getLine()->setOpacity(1);
+            }
+        }
+    }
+}
+
 void graphView::mousePressEvent(QMouseEvent *event)
 {
-    if (!cellChanged_connected) {
-        connect(ui->matrixWidget, &QTableWidget::cellChanged, this, &graphView::on_matrixWidget_cellChanged);
-    }
     if (gen_flag == 0) {
         if (event->button() == Qt::LeftButton) {
             QGraphicsItem* item = my_scene->itemAt(mapToScene(event->pos()), QTransform());
             if (item == NULL) {
+                reverseHighliting(graph_highlighted);
                 QPointF pos = mapToScene(event->pos());
                 pos.rx() -= 30/2; pos.ry() -= 30/2;
                 Node* newNode = new Node(QRectF(0, 0, 30, 30), form_graph.size() + 1);
@@ -168,6 +229,7 @@ void graphView::mousePressEvent(QMouseEvent *event)
                 QGraphicsView::mousePressEvent(event);
             }
         } else if (event->button() == Qt::RightButton) {
+            reverseHighliting(graph_highlighted);
             qDebug("right button pressed");
             QGraphicsItem* item = my_scene->itemAt(mapToScene(event->pos()), QTransform());
             qDebug() << mapToScene(event->pos());
